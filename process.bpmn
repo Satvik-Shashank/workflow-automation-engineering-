@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="https://example.org/bpmn">
+<process id="ShipmentExceptionManagement" name="Logistics and Shipment Exception Management" isExecutable="false">
+<startEvent id="start" name="Start"/>
+<userTask id="book_shipment" name="Create shipment booking"/>
+<businessRuleTask id="validate_booking" name="Validate address, parcel and charges"/>
+<serviceTask id="schedule_pickup" name="Schedule pickup and assign agent"/>
+<manualTask id="collect_scan" name="Collect parcel and scan"/>
+<serviceTask id="transport" name="Move parcel through hubs and line-haul"/>
+<sendTask id="tracking_update" name="Update tracking and notify shipper"/>
+<sendTask id="out_for_delivery" name="Mark out for delivery and notify recipient"/>
+<userTask id="handover" name="Deliver parcel and capture proof"/>
+<serviceTask id="close_invoice" name="Close shipment and generate invoice"/>
+<parallelGateway id="parallel" name="Transport and tracking run concurrently"/>
+<exclusiveGateway id="delivery_outcome" name="Delivery successful?"/>
+<endEvent id="end" name="Shipment delivered"/>
+<sequenceFlow id="flow_1" sourceRef="start" targetRef="book_shipment"/>
+<sequenceFlow id="flow_2" sourceRef="book_shipment" targetRef="validate_booking"/>
+<sequenceFlow id="flow_3" sourceRef="validate_booking" targetRef="schedule_pickup"/>
+<sequenceFlow id="flow_4" sourceRef="schedule_pickup" targetRef="collect_scan"/>
+<sequenceFlow id="flow_5" sourceRef="collect_scan" targetRef="transport"/>
+<sequenceFlow id="flow_6" sourceRef="transport" targetRef="tracking_update"/>
+<sequenceFlow id="flow_7" sourceRef="tracking_update" targetRef="out_for_delivery"/>
+<sequenceFlow id="flow_8" sourceRef="out_for_delivery" targetRef="handover"/>
+<sequenceFlow id="flow_9" sourceRef="handover" targetRef="close_invoice"/>
+<sequenceFlow id="flow_10" sourceRef="close_invoice" targetRef="parallel"/>
+<sequenceFlow id="flow_11" sourceRef="parallel" targetRef="delivery_outcome"/>
+<sequenceFlow id="flow_12" sourceRef="delivery_outcome" targetRef="end"/>
+</process></definitions>
