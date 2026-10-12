@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="https://example.org/bpmn">
+<process id="StudentProjectApproval" name="Student Project Approval and Allocation" isExecutable="false">
+<startEvent id="start" name="Start"/>
+<userTask id="submit_proposal" name="Submit project proposal"/>
+<serviceTask id="validate_proposal" name="Validate form and team rules"/>
+<userTask id="screen_proposal" name="Screen proposal"/>
+<serviceTask id="similarity_check" name="Check topic similarity"/>
+<userTask id="committee_review" name="Evaluate proposal"/>
+<businessRuleTask id="guide_match" name="Match guide by domain and workload"/>
+<serviceTask id="allocate_guide" name="Allocate guide"/>
+<sendTask id="send_request" name="Send allocation request"/>
+<receiveTask id="guide_response" name="Guide accepts allocation"/>
+<serviceTask id="notify_student" name="Notify student and persist allocation"/>
+<exclusiveGateway id="decision" name="Committee decision: approve / revise / reject"/>
+<exclusiveGateway id="acceptance" name="Guide accepts?"/>
+<endEvent id="end" name="Project allocated and confirmed"/>
+<sequenceFlow id="flow_1" sourceRef="start" targetRef="submit_proposal"/>
+<sequenceFlow id="flow_2" sourceRef="submit_proposal" targetRef="validate_proposal"/>
+<sequenceFlow id="flow_3" sourceRef="validate_proposal" targetRef="screen_proposal"/>
+<sequenceFlow id="flow_4" sourceRef="screen_proposal" targetRef="similarity_check"/>
+<sequenceFlow id="flow_5" sourceRef="similarity_check" targetRef="committee_review"/>
+<sequenceFlow id="flow_6" sourceRef="committee_review" targetRef="guide_match"/>
+<sequenceFlow id="flow_7" sourceRef="guide_match" targetRef="allocate_guide"/>
+<sequenceFlow id="flow_8" sourceRef="allocate_guide" targetRef="send_request"/>
+<sequenceFlow id="flow_9" sourceRef="send_request" targetRef="guide_response"/>
+<sequenceFlow id="flow_10" sourceRef="guide_response" targetRef="notify_student"/>
+<sequenceFlow id="flow_11" sourceRef="notify_student" targetRef="decision"/>
+<sequenceFlow id="flow_12" sourceRef="decision" targetRef="acceptance"/>
+<sequenceFlow id="flow_13" sourceRef="acceptance" targetRef="end"/>
+</process></definitions>
