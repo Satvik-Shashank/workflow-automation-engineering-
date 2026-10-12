@@ -1,31 +1,171 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="https://example.org/bpmn">
-<process id="StudentProjectApproval" name="Student Project Approval and Allocation" isExecutable="false">
-<startEvent id="start" name="Start"/>
-<userTask id="submit_proposal" name="Submit project proposal"/>
-<serviceTask id="validate_proposal" name="Validate form and team rules"/>
-<userTask id="screen_proposal" name="Screen proposal"/>
-<serviceTask id="similarity_check" name="Check topic similarity"/>
-<userTask id="committee_review" name="Evaluate proposal"/>
-<businessRuleTask id="guide_match" name="Match guide by domain and workload"/>
-<serviceTask id="allocate_guide" name="Allocate guide"/>
-<sendTask id="send_request" name="Send allocation request"/>
-<receiveTask id="guide_response" name="Guide accepts allocation"/>
-<serviceTask id="notify_student" name="Notify student and persist allocation"/>
-<exclusiveGateway id="decision" name="Committee decision: approve / revise / reject"/>
-<exclusiveGateway id="acceptance" name="Guide accepts?"/>
-<endEvent id="end" name="Project allocated and confirmed"/>
-<sequenceFlow id="flow_1" sourceRef="start" targetRef="submit_proposal"/>
-<sequenceFlow id="flow_2" sourceRef="submit_proposal" targetRef="validate_proposal"/>
-<sequenceFlow id="flow_3" sourceRef="validate_proposal" targetRef="screen_proposal"/>
-<sequenceFlow id="flow_4" sourceRef="screen_proposal" targetRef="similarity_check"/>
-<sequenceFlow id="flow_5" sourceRef="similarity_check" targetRef="committee_review"/>
-<sequenceFlow id="flow_6" sourceRef="committee_review" targetRef="guide_match"/>
-<sequenceFlow id="flow_7" sourceRef="guide_match" targetRef="allocate_guide"/>
-<sequenceFlow id="flow_8" sourceRef="allocate_guide" targetRef="send_request"/>
-<sequenceFlow id="flow_9" sourceRef="send_request" targetRef="guide_response"/>
-<sequenceFlow id="flow_10" sourceRef="guide_response" targetRef="notify_student"/>
-<sequenceFlow id="flow_11" sourceRef="notify_student" targetRef="decision"/>
-<sequenceFlow id="flow_12" sourceRef="decision" targetRef="acceptance"/>
-<sequenceFlow id="flow_13" sourceRef="acceptance" targetRef="end"/>
-</process></definitions>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_1" name="Student Project Approval and Allocation" processRef="StudentProjectApproval" />
+  </bpmn:collaboration>
+  <bpmn:process id="StudentProjectApproval" name="Student Project Approval and Allocation" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_1" name="Student / Team">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>submit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>revise</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>lapsed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_revise</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_2" name="Project Coordinator">
+        <bpmn:flowNodeRef>screen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_3" name="Review Committee (HoD)">
+        <bpmn:flowNodeRef>evaluate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_dec</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>notify_rej</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_rej</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_4" name="Faculty Guide">
+        <bpmn:flowNodeRef>review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>release</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_wd</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_accept</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>exclude</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_msg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_review</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_5" name="Project Management System">
+        <bpmn:flowNodeRef>validate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>similarity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>match</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>reserve</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>send_req</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>persist</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>retry_h</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>notify_ok</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_ok</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>b_persist</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Team decides to submit" />
+    <bpmn:userTask id="submit" name="Submit proposal and team details" />
+    <bpmn:serviceTask id="validate" name="Validate fields and team rules" />
+    <bpmn:userTask id="screen" name="Screen proposal" />
+    <bpmn:serviceTask id="similarity" name="Check topic similarity" />
+    <bpmn:userTask id="evaluate" name="Evaluate feasibility and scope" />
+    <bpmn:exclusiveGateway id="g_dec" name="Committee decision" />
+    <bpmn:userTask id="revise" name="Revise proposal using feedback" />
+    <bpmn:endEvent id="lapsed" name="Lapsed" />
+    <bpmn:sendTask id="notify_rej" name="Notify rejection with reason" />
+    <bpmn:endEvent id="end_rej" name="Rejected" />
+    <bpmn:businessRuleTask id="match" name="Match guide by domain and workload" />
+    <bpmn:serviceTask id="reserve" name="Allocate top-ranked guide" />
+    <bpmn:sendTask id="send_req" name="Send allocation request" />
+    <bpmn:receiveTask id="review" name="Receive guide response" />
+    <bpmn:serviceTask id="release" name="Release guide slot, close case" />
+    <bpmn:endEvent id="end_wd" name="Withdrawn" />
+    <bpmn:exclusiveGateway id="g_accept" name="Guide accepts?" />
+    <bpmn:serviceTask id="exclude" name="Exclude guide, re-match (max 3)" />
+    <bpmn:serviceTask id="persist" name="Persist allocation" />
+    <bpmn:serviceTask id="retry_h" name="Retry 3x, then manual notice" />
+    <bpmn:sendTask id="notify_ok" name="Notify student: confirmed" />
+    <bpmn:endEvent id="end_ok" name="Project allocated and confirmed" />
+    <bpmn:boundaryEvent id="b_revise" name="7-day window" attachedToRef="revise" cancelActivity="true">
+      <bpmn:timerEventDefinition><bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P7D</bpmn:timeDuration></bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="b_msg" name="Team withdraws" attachedToRef="review" cancelActivity="true">
+      <bpmn:messageEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="b_review" name="No response" attachedToRef="review" cancelActivity="true">
+      <bpmn:timerEventDefinition><bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P5D</bpmn:timeDuration></bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="b_persist" name="Save fails" attachedToRef="persist" cancelActivity="true">
+      <bpmn:errorEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="flow_1" sourceRef="start" targetRef="submit" />
+    <bpmn:sequenceFlow id="flow_2" sourceRef="submit" targetRef="validate" />
+    <bpmn:sequenceFlow id="flow_3" sourceRef="validate" targetRef="screen" />
+    <bpmn:sequenceFlow id="flow_4" sourceRef="screen" targetRef="similarity" />
+    <bpmn:sequenceFlow id="flow_5" sourceRef="similarity" targetRef="evaluate" />
+    <bpmn:sequenceFlow id="flow_6" sourceRef="evaluate" targetRef="g_dec" />
+    <bpmn:sequenceFlow id="flow_7" sourceRef="g_dec" targetRef="match" name="approve" />
+    <bpmn:sequenceFlow id="flow_8" sourceRef="g_dec" targetRef="revise" name="revise (max 2 cycles)" />
+    <bpmn:sequenceFlow id="flow_9" sourceRef="g_dec" targetRef="notify_rej" name="reject" />
+    <bpmn:sequenceFlow id="flow_10" sourceRef="notify_rej" targetRef="end_rej" />
+    <bpmn:sequenceFlow id="flow_11" sourceRef="b_revise" targetRef="lapsed" />
+    <bpmn:sequenceFlow id="flow_12" sourceRef="revise" targetRef="submit" name="resubmit" />
+    <bpmn:sequenceFlow id="flow_13" sourceRef="match" targetRef="reserve" />
+    <bpmn:sequenceFlow id="flow_14" sourceRef="reserve" targetRef="send_req" />
+    <bpmn:sequenceFlow id="flow_15" sourceRef="send_req" targetRef="review" />
+    <bpmn:sequenceFlow id="flow_16" sourceRef="review" targetRef="g_accept" />
+    <bpmn:sequenceFlow id="flow_17" sourceRef="b_msg" targetRef="release" />
+    <bpmn:sequenceFlow id="flow_18" sourceRef="release" targetRef="end_wd" />
+    <bpmn:sequenceFlow id="flow_19" sourceRef="b_review" targetRef="exclude" />
+    <bpmn:sequenceFlow id="flow_20" sourceRef="g_accept" targetRef="exclude" name="no" />
+    <bpmn:sequenceFlow id="flow_21" sourceRef="exclude" targetRef="match" name="retry" />
+    <bpmn:sequenceFlow id="flow_22" sourceRef="g_accept" targetRef="persist" name="yes" />
+    <bpmn:sequenceFlow id="flow_23" sourceRef="persist" targetRef="notify_ok" />
+    <bpmn:sequenceFlow id="flow_24" sourceRef="b_persist" targetRef="retry_h" />
+    <bpmn:sequenceFlow id="flow_25" sourceRef="retry_h" targetRef="notify_ok" />
+    <bpmn:sequenceFlow id="flow_26" sourceRef="notify_ok" targetRef="end_ok" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_1_di" bpmnElement="Participant_1" isHorizontal="true"><dc:Bounds x="30" y="30" width="2338" height="1100" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1_di" bpmnElement="Lane_1" isHorizontal="true"><dc:Bounds x="60" y="30" width="2308" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_2_di" bpmnElement="Lane_2" isHorizontal="true"><dc:Bounds x="60" y="250" width="2308" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_3_di" bpmnElement="Lane_3" isHorizontal="true"><dc:Bounds x="60" y="470" width="2308" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_4_di" bpmnElement="Lane_4" isHorizontal="true"><dc:Bounds x="60" y="690" width="2308" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_5_di" bpmnElement="Lane_5" isHorizontal="true"><dc:Bounds x="60" y="910" width="2308" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start"><dc:Bounds x="152" y="67" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="125" y="107" width="90" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="submit_di" bpmnElement="submit"><dc:Bounds x="270" y="50" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="validate_di" bpmnElement="validate"><dc:Bounds x="420" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="screen_di" bpmnElement="screen"><dc:Bounds x="570" y="270" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="similarity_di" bpmnElement="similarity"><dc:Bounds x="720" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="evaluate_di" bpmnElement="evaluate"><dc:Bounds x="870" y="490" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_dec_di" bpmnElement="g_dec" isMarkerVisible="true"><dc:Bounds x="1045" y="500" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1098" y="473" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="revise_di" bpmnElement="revise"><dc:Bounds x="1020" y="50" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lapsed_di" bpmnElement="lapsed"><dc:Bounds x="1202" y="172" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1175" y="212" width="90" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="notify_rej_di" bpmnElement="notify_rej"><dc:Bounds x="1020" y="595" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_rej_di" bpmnElement="end_rej"><dc:Bounds x="1202" y="612" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1175" y="652" width="90" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="match_di" bpmnElement="match"><dc:Bounds x="1170" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="reserve_di" bpmnElement="reserve"><dc:Bounds x="1320" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="send_req_di" bpmnElement="send_req"><dc:Bounds x="1470" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="review_di" bpmnElement="review"><dc:Bounds x="1620" y="710" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="release_di" bpmnElement="release"><dc:Bounds x="1605" y="815" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_wd_di" bpmnElement="end_wd"><dc:Bounds x="1502" y="832" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1475" y="872" width="90" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_accept_di" bpmnElement="g_accept" isMarkerVisible="true"><dc:Bounds x="1795" y="720" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1848" y="693" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclude_di" bpmnElement="exclude"><dc:Bounds x="1770" y="815" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="persist_di" bpmnElement="persist"><dc:Bounds x="1920" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="retry_h_di" bpmnElement="retry_h"><dc:Bounds x="2070" y="1035" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="notify_ok_di" bpmnElement="notify_ok"><dc:Bounds x="2070" y="930" width="100" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_ok_di" bpmnElement="end_ok"><dc:Bounds x="2252" y="947" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2225" y="987" width="90" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_revise_di" bpmnElement="b_revise"><dc:Bounds x="1072" y="102" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1112" y="138" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_msg_di" bpmnElement="b_msg"><dc:Bounds x="1637" y="762" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1677" y="798" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_review_di" bpmnElement="b_review"><dc:Bounds x="1692" y="762" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1732" y="798" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="b_persist_di" bpmnElement="b_persist"><dc:Bounds x="1972" y="982" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2012" y="1018" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow_1_di" bpmnElement="flow_1"><di:waypoint x="188" y="85" /><di:waypoint x="270" y="85" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_2_di" bpmnElement="flow_2"><di:waypoint x="370" y="85" /><di:waypoint x="398" y="85" /><di:waypoint x="398" y="965" /><di:waypoint x="420" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_3_di" bpmnElement="flow_3"><di:waypoint x="520" y="965" /><di:waypoint x="548" y="965" /><di:waypoint x="548" y="305" /><di:waypoint x="570" y="305" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_4_di" bpmnElement="flow_4"><di:waypoint x="670" y="305" /><di:waypoint x="698" y="305" /><di:waypoint x="698" y="965" /><di:waypoint x="720" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_5_di" bpmnElement="flow_5"><di:waypoint x="820" y="965" /><di:waypoint x="848" y="965" /><di:waypoint x="848" y="525" /><di:waypoint x="870" y="525" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_6_di" bpmnElement="flow_6"><di:waypoint x="970" y="525" /><di:waypoint x="1045" y="525" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_7_di" bpmnElement="flow_7"><di:waypoint x="1095" y="525" /><di:waypoint x="1148" y="525" /><di:waypoint x="1148" y="965" /><di:waypoint x="1170" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_8_di" bpmnElement="flow_8"><di:waypoint x="1070" y="500" /><di:waypoint x="1070" y="120" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_9_di" bpmnElement="flow_9"><di:waypoint x="1070" y="550" /><di:waypoint x="1070" y="595" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_10_di" bpmnElement="flow_10"><di:waypoint x="1120" y="630" /><di:waypoint x="1202" y="630" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_11_di" bpmnElement="flow_11"><di:waypoint x="1090" y="138" /><di:waypoint x="1090" y="190" /><di:waypoint x="1202" y="190" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_12_di" bpmnElement="flow_12"><di:waypoint x="1070" y="50" /><di:waypoint x="1070" y="36" /><di:waypoint x="320" y="36" /><di:waypoint x="320" y="50" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_13_di" bpmnElement="flow_13"><di:waypoint x="1270" y="965" /><di:waypoint x="1320" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_14_di" bpmnElement="flow_14"><di:waypoint x="1420" y="965" /><di:waypoint x="1470" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_15_di" bpmnElement="flow_15"><di:waypoint x="1570" y="965" /><di:waypoint x="1598" y="965" /><di:waypoint x="1598" y="745" /><di:waypoint x="1620" y="745" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_16_di" bpmnElement="flow_16"><di:waypoint x="1720" y="745" /><di:waypoint x="1795" y="745" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_17_di" bpmnElement="flow_17"><di:waypoint x="1655" y="798" /><di:waypoint x="1655" y="815" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_18_di" bpmnElement="flow_18"><di:waypoint x="1605" y="850" /><di:waypoint x="1538" y="850" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_19_di" bpmnElement="flow_19"><di:waypoint x="1710" y="798" /><di:waypoint x="1710" y="850" /><di:waypoint x="1770" y="850" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_20_di" bpmnElement="flow_20"><di:waypoint x="1820" y="770" /><di:waypoint x="1820" y="815" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_21_di" bpmnElement="flow_21"><di:waypoint x="1820" y="885" /><di:waypoint x="1820" y="900" /><di:waypoint x="1220" y="900" /><di:waypoint x="1220" y="930" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_22_di" bpmnElement="flow_22"><di:waypoint x="1845" y="745" /><di:waypoint x="1898" y="745" /><di:waypoint x="1898" y="965" /><di:waypoint x="1920" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_23_di" bpmnElement="flow_23"><di:waypoint x="2020" y="965" /><di:waypoint x="2070" y="965" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_24_di" bpmnElement="flow_24"><di:waypoint x="1990" y="1018" /><di:waypoint x="1990" y="1070" /><di:waypoint x="2070" y="1070" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_25_di" bpmnElement="flow_25"><di:waypoint x="2120" y="1035" /><di:waypoint x="2120" y="1000" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_26_di" bpmnElement="flow_26"><di:waypoint x="2170" y="965" /><di:waypoint x="2252" y="965" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
